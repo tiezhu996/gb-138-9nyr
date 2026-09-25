@@ -11,6 +11,8 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Shanghai
+      PGTZ: Asia/Shanghai
     ports:
       - "${DB_PORT:-5738}:5432"
     volumes:
@@ -28,6 +30,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
+      TZ: Asia/Shanghai
       PORT: 3000
       DB_HOST: db
       DB_PORT: 5432

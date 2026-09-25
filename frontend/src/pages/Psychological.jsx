@@ -1,40 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { meditationAudios, selfAssessmentQuestions, getResultInterpretation, hotlines } from '../data/psychological';
+import { meditationAudios, hotlines } from '../data/psychological';
+import AssessmentArchive from '../components/AssessmentArchive';
 
 const Psychological = () => {
   const [activeTab, setActiveTab] = useState('meditation');
   const [selectedMeditation, setSelectedMeditation] = useState(null);
-  const [assessmentStarted, setAssessmentStarted] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [showResult, setShowResult] = useState(false);
 
   const tabs = [
     { id: 'meditation', label: '冥想音频', icon: '🧘' },
     { id: 'assessment', label: '自测量表', icon: '📝' },
     { id: 'hotlines', label: '援助热线', icon: '📞' }
   ];
-
-  const handleAnswer = (value) => {
-    setAnswers({ ...answers, [currentQuestion]: value });
-    if (currentQuestion < selfAssessmentQuestions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    } else {
-      setShowResult(true);
-    }
-  };
-
-  const calculateScore = () => {
-    return Object.values(answers).reduce((sum, val) => sum + val, 0);
-  };
-
-  const resetAssessment = () => {
-    setAssessmentStarted(false);
-    setCurrentQuestion(0);
-    setAnswers({});
-    setShowResult(false);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50">
@@ -191,139 +168,7 @@ const Psychological = () => {
           )}
 
           {activeTab === 'assessment' && (
-            <div>
-              {!assessmentStarted ? (
-                <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-10 text-center border border-white/60 overflow-hidden">
-                  <div className="absolute top-0 right-0 w-48 h-48 opacity-10">
-                    <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500" />
-                  </div>
-                  <div className="relative">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-5xl shadow-2xl mx-auto mb-8">
-                      📝
-                    </div>
-                    <h3 className="text-3xl font-bold text-warm-800 mb-4">
-                      心理压力自测
-                    </h3>
-                    <p className="text-warm-600 mb-8 max-w-lg mx-auto text-lg leading-relaxed">
-                      本测验包含8个问题，大约需要5分钟完成。请根据您最近一周的实际情况作答，
-                      答案没有对错之分，诚实作答才能获得准确的结果。
-                    </p>
-                    <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8 max-w-lg mx-auto">
-                      <p className="text-amber-700">
-                        ⚠️ 本自测仅供参考，不能替代专业诊断。如有需要，请寻求专业心理咨询师的帮助。
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setAssessmentStarted(true)}
-                      className="px-10 py-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full font-bold text-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 shadow-lg"
-                    >
-                      开始测试
-                    </button>
-                  </div>
-                </div>
-              ) : showResult ? (
-                <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-10 border border-white/60 overflow-hidden">
-                  <div className="relative">
-                    <div className="text-center mb-10">
-                      <div className={`w-24 h-24 rounded-full flex items-center justify-center text-5xl shadow-2xl mx-auto mb-6 ${
-                        getResultInterpretation(calculateScore()).color === 'green' ? 'bg-gradient-to-br from-green-100 to-emerald-100' :
-                        getResultInterpretation(calculateScore()).color === 'yellow' ? 'bg-gradient-to-br from-yellow-100 to-amber-100' :
-                        getResultInterpretation(calculateScore()).color === 'orange' ? 'bg-gradient-to-br from-orange-100 to-red-100' : 'bg-gradient-to-br from-red-100 to-rose-100'
-                      }`}>
-                        {getResultInterpretation(calculateScore()).color === 'green' ? '😊' :
-                         getResultInterpretation(calculateScore()).color === 'yellow' ? '😐' :
-                         getResultInterpretation(calculateScore()).color === 'orange' ? '😟' : '😢'}
-                      </div>
-                      <h3 className="text-3xl font-bold text-warm-800 mb-3">
-                        测试结果
-                      </h3>
-                      <p className={`text-4xl font-bold mb-4 ${
-                        getResultInterpretation(calculateScore()).color === 'green' ? 'text-green-600' :
-                        getResultInterpretation(calculateScore()).color === 'yellow' ? 'text-yellow-600' :
-                        getResultInterpretation(calculateScore()).color === 'orange' ? 'text-orange-600' : 'text-red-600'
-                      }`}>
-                        {getResultInterpretation(calculateScore()).level}
-                      </p>
-                      <p className="text-warm-500 text-lg">
-                        得分：{calculateScore()} / 24
-                      </p>
-                    </div>
-
-                    <div className="bg-warm-50 rounded-2xl p-8 mb-8 border border-warm-100">
-                      <p className="text-warm-700 mb-6 text-lg leading-relaxed">
-                        {getResultInterpretation(calculateScore()).description}
-                      </p>
-                      <h4 className="font-bold text-warm-800 mb-4 text-xl">💡 建议：</h4>
-                      <ul className="space-y-3">
-                        {getResultInterpretation(calculateScore()).suggestions.map((suggestion, index) => (
-                          <li key={index} className="flex items-start gap-3 text-warm-600 text-lg">
-                            <span className="text-violet-500 mt-1.5 text-xl">•</span>
-                            <span>{suggestion}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {getResultInterpretation(calculateScore()).color === 'red' && (
-                      <div className="bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-2xl p-6 mb-8">
-                        <p className="text-red-700 font-medium">
-                          💡 您的心理压力较重，强烈建议您寻求专业心理支持。您可以拨打我们的援助热线，
-                          或咨询专业心理咨询师。请记住，寻求帮助是勇敢的表现。
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="flex justify-center gap-4">
-                      <button
-                        onClick={resetAssessment}
-                        className="px-8 py-3 bg-warm-100 text-warm-700 rounded-full font-semibold hover:bg-warm-200 transition-colors"
-                      >
-                        重新测试
-                      </button>
-                      <button
-                        onClick={() => setActiveTab('hotlines')}
-                        className="px-8 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full font-semibold hover:shadow-lg transition-all"
-                      >
-                        查看援助热线
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-10 border border-white/60 overflow-hidden">
-                  <div className="relative">
-                    <div className="mb-8">
-                      <div className="flex justify-between text-warm-500 mb-3 font-medium">
-                        <span>问题 {currentQuestion + 1} / {selfAssessmentQuestions.length}</span>
-                        <span>{Math.round(((currentQuestion + 1) / selfAssessmentQuestions.length) * 100)}%</span>
-                      </div>
-                      <div className="w-full bg-warm-100 rounded-full h-3">
-                        <div
-                          className="bg-gradient-to-r from-blue-500 to-indigo-500 h-3 rounded-full transition-all duration-500"
-                          style={{ width: `${((currentQuestion + 1) / selfAssessmentQuestions.length) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    <h3 className="text-2xl font-bold text-warm-800 mb-8 leading-relaxed">
-                      {selfAssessmentQuestions[currentQuestion].question}
-                    </h3>
-
-                    <div className="space-y-4">
-                      {selfAssessmentQuestions[currentQuestion].options.map((option, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleAnswer(option.value)}
-                          className="w-full p-5 text-left bg-warm-50 hover:bg-violet-50 rounded-2xl transition-all duration-300 border-2 border-transparent hover:border-violet-300 hover:shadow-lg group"
-                        >
-                          <span className="text-warm-700 text-lg group-hover:text-violet-700 transition-colors">{option.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <AssessmentArchive onGoHotlines={() => setActiveTab('hotlines')} />
           )}
 
           {activeTab === 'hotlines' && (
