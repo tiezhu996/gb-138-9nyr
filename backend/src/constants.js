@@ -7,6 +7,8 @@ const project = {
 const messages = {
   health: `${project.name} backend is running`,
   notFound: 'Not found',
+  methodNotAllowed: 'Method not allowed',
+  serverError: '服务器开小差了，请稍后再试',
   serverStarted: `${project.id} backend listening`,
 };
 
